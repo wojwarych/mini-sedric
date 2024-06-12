@@ -1,0 +1,11 @@
+name: mini-sedric
+
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+      target: prod
+    command: "poetry run fastapi run main.py"
+    ports:
+      - 8000:8000
