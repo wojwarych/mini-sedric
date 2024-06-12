@@ -9,6 +9,19 @@ readme = "README.md"
 python = "^3.11"
 fastapi = "^0.111.0"
 
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+isort = "^5.13.2"
+flake8 = "^7.0.0"
+mypy = "^1.10.0"
+pylint = "^3.2.3"
+autoflake = "^2.3.1"
+
+[tool.poetry.scripts]
+format = "scripts.scripts:format"
+
+[tool.isort]
+profile = "black"
 
 [build-system]
 requires = ["poetry-core"]
