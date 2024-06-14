@@ -8,4 +8,4 @@ services:
       target: prod
     command: "poetry run fastapi run main.py"
     ports:
-      - 8000:8000
+      - 80:80

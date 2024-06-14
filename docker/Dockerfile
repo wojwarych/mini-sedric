@@ -1,5 +1,6 @@
 FROM python:3.11-slim-bookworm as base
 
+ENV PYTHONBUFFERED=1
 ENV POETRY_VERSION=1.8.3
 ENV POETRY_HOME=/opt/poetry
 ENV POETRY_VENV=/opt/poetry-venv
@@ -26,3 +27,5 @@ FROM base as prod
 COPY --from=base /app /app
 RUN poetry install --no-interaction --no-cache --without dev
 COPY ./mini_sedric/ .
+EXPOSE 80
+CMD ["poetry", "run", "fastapi", "run", "main.py", "--port", "80"]
