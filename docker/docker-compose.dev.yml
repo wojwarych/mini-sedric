@@ -6,6 +6,6 @@ services:
       context: ../
       dockerfile: ./docker/Dockerfile
       target: dev
-    command: "poetry run fastapi dev main.py"
+    command: "poetry run fastapi dev main.py --host 0.0.0.0"
     ports:
       - 8000:8000
