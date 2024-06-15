@@ -16,6 +16,8 @@ flake8 = "^7.0.0"
 mypy = "^1.10.0"
 pylint = "^3.2.3"
 autoflake = "^2.3.1"
+pytest = "^8.2.2"
+trio = "^0.25.1"
 
 [tool.poetry.scripts]
 format = "scripts.scripts:format"
