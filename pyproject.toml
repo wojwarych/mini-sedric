@@ -25,6 +25,10 @@ format = "scripts.scripts:format"
 [tool.isort]
 profile = "black"
 
+[tool.pylint]
+max-line-length = 88
+ignore = "tests"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
