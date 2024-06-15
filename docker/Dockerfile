@@ -14,17 +14,17 @@ RUN python3 -m venv $POETRY_VENV \
 
 ENV PATH="${PATH}:${POETRY_VENV}/bin"
 
-WORKDIR /app
+WORKDIR /mini_sedric
 
 COPY ../poetry.lock ../pyproject.toml .
 
 FROM base as dev
-COPY --from=base /app /app
+COPY --from=base /mini_sedric /mini_sedric
 RUN poetry install --no-interaction --no-cache
 COPY ./mini_sedric/ .
 
 FROM base as prod
-COPY --from=base /app /app
+COPY --from=base /mini_sedric /mini_sedric
 RUN poetry install --no-interaction --no-cache --without dev
 COPY ./mini_sedric/ .
 EXPOSE 80
