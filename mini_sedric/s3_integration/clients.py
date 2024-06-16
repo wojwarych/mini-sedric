@@ -1,4 +1,5 @@
 """Module for implementations of S3Interface ABC class"""
+
 from urllib.parse import urlparse
 
 import boto3
