@@ -33,4 +33,6 @@ jobs:
       - name: Install projects dependencies
         run: poetry install
       - name: Linters & Formatters
-        run: poetry run format
+        run: poetry run check
+      - name: Tests
+        run: ENV_FOR_DYNACONF=testing poetry run pytest
