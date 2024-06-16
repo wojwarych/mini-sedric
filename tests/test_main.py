@@ -1,15 +1,14 @@
 from collections.abc import AsyncIterator
 
 import pytest
-from pytest_mock import MockerFixture
 from fastapi import status
 from httpx import AsyncClient
+from pytest_mock import MockerFixture
 
 from mini_sedric.main import app
 from mini_sedric.models import InteractionInput
-from mini_sedric.usecases import S3BucketNotFoundException
 from mini_sedric.s3_integration import LocalS3Interface, S3Interface, connect_to_s3
-
+from mini_sedric.usecases import S3BucketNotFoundException
 
 pytestmark = pytest.mark.anyio
 
