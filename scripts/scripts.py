@@ -9,7 +9,7 @@ def format():
         [
             "autoflake",
             "-r",
-            "--cd",
+            "-cd",
             "--remove-all-unused-imports",
             "--ignore-init-module-imports",
             "mini_sedric",
