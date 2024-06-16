@@ -1,4 +1,5 @@
 """Module for implementations of S3Interface ABC class"""
+from urllib.parse import urlparse
 
 import boto3
 import botocore
@@ -35,8 +36,11 @@ class S3AWSInterface(S3Interface):
 
     def check(self, uri: str) -> bool:
         try:
-            sanitized_uri = uri.lstrip("s3://").rsplit("/")
-            self.s3_client.head_object(Bucket=sanitized_uri[0], Key=sanitized_uri[1])
+            parsed_s3_uri = urlparse(uri)
+            self.s3_client.head_object(
+                Bucket=parsed_s3_uri.netloc,
+                Key=parsed_s3_uri.path.lstrip("/"),
+            )
         except botocore.exceptions.ClientError as e:
             if e.response["Error"]["Code"] == "404":
                 print("Object not found!")
