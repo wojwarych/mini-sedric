@@ -19,11 +19,13 @@ WORKDIR /mini_sedric
 COPY ../poetry.lock ../pyproject.toml .
 
 FROM base as dev
+ENV ENV_FOR_DYNACONF=development
 COPY --from=base /mini_sedric /mini_sedric
 RUN poetry install --no-interaction --no-cache
 COPY ./mini_sedric/ .
 
 FROM base as prod
+ENV ENV_FOR_DYNACONF=production
 COPY --from=base /mini_sedric /mini_sedric
 RUN poetry install --no-interaction --no-cache --without dev
 COPY ./mini_sedric/ .
