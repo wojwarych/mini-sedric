@@ -25,20 +25,27 @@ class LocalS3Interface(S3Interface):
         return uri in self.data
 
     def get_object(self, bucket_name: str, object_key: str) -> dict[str, Any]:
-        body_json = {
-            "results": {
-                "transcripts": [
-                    {
-                        "transcript": "Transcription text, and? That has multiple sentences. Great!"  # noqa: E501
-                    }
-                ]
+        if object_key in self.data:
+            body_json = {
+                "results": {
+                    "transcripts": [
+                        {
+                            "transcript": "Transcription text, and? That has multiple sentences. Great!"  # noqa: E501
+                        }
+                    ]
+                }
             }
-        }
 
-        encoded = json.dumps(body_json).encode("utf-8")
+            encoded = json.dumps(body_json).encode("utf-8")
 
-        body = StreamingBody(BytesIO(encoded), len(encoded))
-        return {"Body": body}
+            body = StreamingBody(BytesIO(encoded), len(encoded))
+            return {"Body": body}
+        return {}
+
+    def add_to_bucket(
+        self, s3_uri: str, object_key: str, data: bytes
+    ) -> dict[str, Any]:
+        return {}
 
     def close(self) -> None:
         return
@@ -50,7 +57,7 @@ class S3AWSInterface(S3Interface):
     def __init__(self) -> None:
         self.s3_client = boto3.client(
             "s3",
-            endpoint_url=settings.aws_endpoint,
+            endpoint_url=settings.s3_aws_endpoint,
             aws_access_key_id=settings.aws_access_key_id,
             aws_secret_access_key=settings.aws_secret_access_key,
             region_name=settings.region_name,
@@ -82,6 +89,22 @@ class S3AWSInterface(S3Interface):
                 print("Unexpected error!")
                 print(e.response)
             return {}
+        return ret
+
+    def add_to_bucket(
+        self, s3_uri: str, object_key: str, data: bytes
+    ) -> dict[str, Any]:
+        try:
+            parsed_bucket_uri = urlparse(s3_uri)
+            ret = self.s3_client.put_object(
+                Body=data, Bucket=parsed_bucket_uri.netloc, Key=object_key
+            )
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "404":
+                print("Object not found!")
+            else:
+                print("Unexpected error!")
+                print(e.response)
         return ret
 
     def close(self) -> None:
