@@ -168,6 +168,7 @@ data "aws_iam_policy_document" "s3_data_bucket_policy" {
     actions = [
       "s3:GetObject",
       "s3:ReadObject",
+      "s3:PutObject",
     ]
     resources = [
       "arn:aws:s3:::${aws_s3_bucket.audio_bucket.bucket}/*"
