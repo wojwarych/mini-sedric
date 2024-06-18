@@ -4,6 +4,7 @@ Module running extraction of insights from transcribed mp3 file, taken from S3 b
 file with TranscriberWorkerInterface
 """
 
+import json
 import time
 
 from mini_sedric.s3_integration import S3Interface
@@ -23,7 +24,7 @@ def create_insights(  # pylint: disable=too-many-arguments
     s3_interface: S3Interface,
     transcribe_service: TranscribeWorkerInterface,
     extractor: InsightsExtractor,
-) -> dict[str, list[dict[str, int | str]]]:
+) -> None:
     """
     Creates insights data about each tracker from the request.
 
@@ -37,7 +38,6 @@ def create_insights(  # pylint: disable=too-many-arguments
     Returns:
         str
     """
-
     transcribe_service.start_job(job_name, s3_file_uri, s3_interface)
 
     _wait_for_the_job_to_complete(job_name, transcribe_service)
@@ -46,15 +46,17 @@ def create_insights(  # pylint: disable=too-many-arguments
 
     ret = {"insights": list(extractor.find_trackers(trackers, transcript))}
 
-    # jobs should be rather kept as long possible for log reasons
-    # the TranscriberWorkerInterface.start_job() should have better naming
-    # mechanism for transcription jobs
+    byte_data = json.dumps(ret).encode("utf-8")
+
+    s3_interface.add_to_bucket(s3_file_uri, f"{job_name}.insights", byte_data)
+
     try:
+        # jobs should be rather kept as long possible for log reasons
+        # the TranscriberWorkerInterface.start_job() should have better naming
+        # mechanism for transcription jobs
         transcribe_service.delete_job(job_name)
     except TranscribeWorkerError as e:
         raise JobServiceError("Couldn't delete finished job!") from e
-
-    return ret
 
 
 def _wait_for_the_job_to_complete(

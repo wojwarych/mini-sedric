@@ -65,12 +65,10 @@ class InsightsExtractor:
             pattern = rf"({insight})"
             search = re.search(pattern, transcript)
             if search:
-                print(search)
                 ret["start_word_index"] = search.start()
                 ret["end_word_index"] = search.end()
                 ret["tracker_value"] = insight
                 ret["transcribe_value"] = search.group(1)
                 # provide better way for sentence index
                 ret["sentence_index"] = search.start()
-                print(ret)
                 yield ret
