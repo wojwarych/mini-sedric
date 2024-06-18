@@ -1,9 +1,14 @@
+# pylint: disable=C0301
 """Module for implementations of S3Interface ABC class"""
 
+import json
+from io import BytesIO
+from typing import Any
 from urllib.parse import urlparse
 
 import boto3
 import botocore
+from botocore.response import StreamingBody
 
 from mini_sedric.config import settings
 
@@ -18,6 +23,22 @@ class LocalS3Interface(S3Interface):
 
     def check(self, uri: str) -> bool:
         return uri in self.data
+
+    def get_object(self, bucket_name: str, object_key: str) -> dict[str, Any]:
+        body_json = {
+            "results": {
+                "transcripts": [
+                    {
+                        "transcript": "Transcription text, and? That has multiple sentences. Great!"  # noqa: E501
+                    }
+                ]
+            }
+        }
+
+        encoded = json.dumps(body_json).encode("utf-8")
+
+        body = StreamingBody(BytesIO(encoded), len(encoded))
+        return {"Body": body}
 
     def close(self) -> None:
         return
@@ -50,6 +71,18 @@ class S3AWSInterface(S3Interface):
                 print(e.response)
             return False
         return True
+
+    def get_object(self, bucket_name: str, object_key: str) -> dict[str, Any]:
+        try:
+            ret = self.s3_client.get_object(Bucket=bucket_name, Key=object_key)
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "404":
+                print("Object not found!")
+            else:
+                print("Unexpected error!")
+                print(e.response)
+            return {}
+        return ret
 
     def close(self) -> None:
         self.s3_client.close()
