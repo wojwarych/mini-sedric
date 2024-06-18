@@ -54,7 +54,7 @@ class AWSTranscribeWorker(TranscribeWorkerInterface):
     def __init__(self) -> None:
         self.transcribe_client = boto3.client(
             "transcribe",
-            endpoint_url=settings.aws_endpoint,
+            endpoint_url=settings.transcribe_aws_endpoint,
             aws_access_key_id=settings.aws_access_key_id,
             aws_secret_access_key=settings.aws_secret_access_key,
             region_name=settings.region_name,
@@ -70,6 +70,8 @@ class AWSTranscribeWorker(TranscribeWorkerInterface):
             Media={"MediaFileUri": s3_file_uri},
             MediaFormat="mp3",
             LanguageCode="en-US",
+            OutputBucketName=settings.s3_bucket_name,
+            OutputKey=job_name,
         )
 
     def get_transcription_job_status(self, job_name: str) -> str:
