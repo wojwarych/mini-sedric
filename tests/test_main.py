@@ -7,12 +7,7 @@ from pytest_mock import MockerFixture
 
 from mini_sedric.main import app
 from mini_sedric.models import InteractionInput
-from mini_sedric.s3_integration import (
-    LocalS3Interface,
-    S3BucketNotFoundException,
-    S3Interface,
-    connect_to_s3,
-)
+from mini_sedric.s3_integration import LocalS3Interface, S3Interface, connect_to_s3
 from mini_sedric.transcribe_service import (
     LocalTranscribeWorker,
     TranscribeWorkerInterface,
@@ -72,36 +67,20 @@ async def test_root() -> None:
     assert response.json() == "Hello, MiniSedric!"
 
 
-async def test_insights_returns_200_on_successful_transcribe_job(
+async def test_post_insights_returns_201_on_successful_transcribe_job_creation(
     interaction_input: dict[str, str | list[str]], mocker: MockerFixture
 ) -> None:
-    mocked_insights = mocker.patch("mini_sedric.main.create_insights")
-    mocked_insights.return_value = {
-        "insights": [
-            {
-                "sentence_index": 4,
-                "start_word_index": 2,
-                "end_word_index": 5,
-                "tracker_value": interaction_input["trackers"][0],
-                "transcribe_value": "some transcription",
-            }
-        ]
-    }
     async with AsyncClient(app=app, base_url="http://test") as ac:
         response = await ac.post("/insights", json=interaction_input)
-    assert response.status_code == status.HTTP_200_OK
+    assert response.status_code == status.HTTP_201_CREATED
     assert response.json()
-    assert (
-        response.json()["insights"][0]["tracker_value"]
-        == interaction_input["trackers"][0]
+    assert response.json()["name"] == (
+        interaction_input["interaction_url"].split("/")[-1] + ".json.insights"  # type: ignore[union-attr]  # noqa: E501  # pylint: disable=line-too-long
     )
 
 
-async def test_insights_returns_404_on_no_bucket_data(
-    interaction_input: dict[str, str | list[str]], mocker: MockerFixture
-) -> None:
-    mocked_insights = mocker.patch("mini_sedric.main.create_insights")
-    mocked_insights.side_effect = S3BucketNotFoundException("Not found!")
+async def test_get_insights_returns_dict_from_s3():
     async with AsyncClient(app=app, base_url="http://test") as ac:
-        response = await ac.post("/insights", json=interaction_input)
-    assert response.status_code == status.HTTP_404_NOT_FOUND
+        response = await ac.get("/insights/some-job-name")
+    assert response.status_code == status.HTTP_200_OK
+    assert response.json() == {"insights": []}

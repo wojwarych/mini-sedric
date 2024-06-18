@@ -33,11 +33,21 @@ class TrackerData(BaseModel):
     transcribe_value: str
 
 
-class InsightsResponse(BaseModel):
-    """Model returned by /insights call
+class InsightsGetResponse(BaseModel):
+    """Model returned by GET /insights/{job_name} call
 
     Attributes:
-        insihgts (list[TrackerData]): list of all matched tracker data
+        insights (list[TrackerData]): list of found trakcers in the transcription
     """
 
     insights: list[TrackerData]
+
+
+class InsightsPostResponse(BaseModel):
+    """Model returned by POST /insights call
+
+    Attributes:
+        name (str): name of json with insights from transcription
+    """
+
+    name: str
