@@ -3,7 +3,7 @@ import subprocess
 
 def format():
     subprocess.run(["black", "."])
-    subprocess.run(["isort", "."])
+    subprocess.run(["isort", "mini_sedric/", "tests/"])
     subprocess.run(["flake8", "mini_sedric/", "tests/"])
     subprocess.run(
         [
