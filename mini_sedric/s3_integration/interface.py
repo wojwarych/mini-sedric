@@ -43,3 +43,19 @@ class S3Interface(ABC):
         Returns:
             None
         """
+
+    @abstractmethod
+    def add_to_bucket(
+        self, s3_uri: str, object_key: str, data: bytes
+    ) -> dict[str, Any]:
+        """
+        Adds insights data as a JSON bucket
+
+        Args:
+            s3_uri (str): URI of bucket to which data should be added
+            object_key (str): object name to be added
+            data (bytes): data which should be send to bucket
+
+        Returns:
+            None
+        """
