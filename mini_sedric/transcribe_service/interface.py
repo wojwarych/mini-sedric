@@ -37,6 +37,30 @@ class TranscribeWorkerInterface(ABC):
         """
 
     @abstractmethod
+    def get_transcript_uri(self, job_name) -> str:
+        """
+        Gets URI to S3 bucket where the transcription resides
+
+        Args:
+            job_name (str): name of job for which look for transcription
+
+        Returns:
+            str: URI string to S3 bucket
+        """
+
+    @abstractmethod
+    def delete_job(self, job_name) -> None:
+        """
+        Deletes transcription job
+
+        Args:
+            job_name (str): name of job for which look for transcription
+
+        Returns:
+            None
+        """
+
+    @abstractmethod
     def close(self) -> None:
         """
         Closes properly connection with TranscribeService client

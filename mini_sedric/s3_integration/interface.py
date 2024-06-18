@@ -1,6 +1,7 @@
 """Interface for creating connection with AWS S3 Bucket"""
 
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 class S3Interface(ABC):
@@ -19,6 +20,19 @@ class S3Interface(ABC):
 
         Returns:
             bool: True if object with such URI exists in the S3
+        """
+
+    @abstractmethod
+    def get_object(self, bucket_name: str, object_key: str) -> dict[str, Any]:
+        """
+        Gets the object from the S3 bucket
+
+        Args:
+            bucket_name (str): name of the bucket
+            object_key (str): object's key which has to be fetched
+
+        Returns:
+            dict[str, Any]: response containing data and metadata about the object
         """
 
     @abstractmethod

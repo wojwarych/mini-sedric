@@ -2,7 +2,9 @@
 
 from collections.abc import AsyncIterator
 
-from .client import LocalTranscribeWorker
+from mini_sedric.config import settings
+
+from .client import AWSTranscribeWorker, LocalTranscribeWorker
 from .interface import TranscribeWorkerInterface
 
 
@@ -12,7 +14,11 @@ async def connect_to_transcribe_service() -> AsyncIterator[TranscribeWorkerInter
     Yields:
         AsyncIterator[TranscribeWorkerInterface]: Instance of the interface
     """
-    transcribe_worker = LocalTranscribeWorker()
+    transcribe_worker = (
+        LocalTranscribeWorker()
+        if settings.env_for_dynaconf == "testing"
+        else AWSTranscribeWorker()
+    )
     try:
         yield transcribe_worker
     finally:
