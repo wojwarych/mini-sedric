@@ -25,22 +25,20 @@ class LocalS3Interface(S3Interface):
         return uri in self.data
 
     def get_object(self, bucket_name: str, object_key: str) -> dict[str, Any]:
-        if object_key in self.data:
-            body_json = {
-                "results": {
-                    "transcripts": [
-                        {
-                            "transcript": "Transcription text, and? That has multiple sentences. Great!"  # noqa: E501
-                        }
-                    ]
-                }
+        body_json = {
+            "results": {
+                "transcripts": [
+                    {
+                        "transcript": "Transcription text, and? That has multiple sentences. Great!"  # noqa: E501
+                    }
+                ]
             }
+        }
 
-            encoded = json.dumps(body_json).encode("utf-8")
+        encoded = json.dumps(body_json).encode("utf-8")
 
-            body = StreamingBody(BytesIO(encoded), len(encoded))
-            return {"Body": body}
-        return {}
+        body = StreamingBody(BytesIO(encoded), len(encoded))
+        return {"Body": body}
 
     def add_to_bucket(
         self, s3_uri: str, object_key: str, data: bytes
